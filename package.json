@@ -1,0 +1,35 @@
+{
+  "name": "ws-lobby-tools",
+  "version": "1.0.0",
+  "description": "A lobby system for NodeJS web sockets with JSON RPC",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Quacky2200/ws-lobby-tools.git"
+  },
+  "keywords": [
+    "websocket",
+    "sockets",
+    "ws",
+    "lobby",
+    "rooms",
+    "tools"
+  ],
+  "author": "Matthew James <Quacky2200@users.noreply.github.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Quacky2200/ws-lobby-tools/issues"
+  },
+  "homepage": "https://github.com/Quacky2200/ws-lobby-tools#readme",
+  "dependencies": {
+    "cat-names": "^3.0.0",
+    "dog-names": "^2.0.0",
+    "id-phrase-generator": "github:Quacky2200/id-phrase-generator",
+    "superheroes": "^3.0.0",
+    "supervillains": "^3.0.0",
+    "uuid": "^3.3.3"
+  }
+}
