@@ -1,9 +1,10 @@
 {
   "name": "ws-lobby-tools",
   "version": "1.0.0",
-  "description": "A lobby system for NodeJS web sockets with JSON RPC",
+  "description": "A lobby system for NodeJS websockets/TCP with JSON RPC",
   "main": "index.js",
   "scripts": {
+    "run-chat-example": "node examples/chat-client/index",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -11,15 +12,20 @@
     "url": "git+https://github.com/Quacky2200/ws-lobby-tools.git"
   },
   "keywords": [
+    "easy",
+    "simple",
     "websocket",
     "sockets",
     "ws",
+    "wss",
+    "tcp",
     "lobby",
     "rooms",
-    "tools"
+    "tools",
+    "framework"
   ],
   "author": "Matthew James <Quacky2200@users.noreply.github.com>",
-  "license": "MIT",
+  "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/Quacky2200/ws-lobby-tools/issues"
   },

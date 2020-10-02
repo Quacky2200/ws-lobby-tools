@@ -15,8 +15,31 @@
  *    You should have received a copy of the GNU General Public License
  *    along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-module.exports = {
-	'Lobby': require('./lobby'),
-	'Room': require('./room'),
-	'User': require('./user')
+const {Request} = require('../libs/json-rpc');
+
+class Ping extends Request {
+	constructor() {
+		super('ping');
+	}
+
+	static sendTo(client) {
+		var instance = new Ping();
+		instance.sendTo(client);
+	}
 }
+
+class Pong extends Request {
+	constructor() {
+		super('pong');
+	}
+
+	static sendTo(client) {
+		var instance = new Pong();
+		instance.sendTo(client);
+	}
+}
+
+module.exports = {
+	Ping: Ping,
+	Pong: Pong
+};

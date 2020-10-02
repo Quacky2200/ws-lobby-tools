@@ -15,8 +15,23 @@
  *    You should have received a copy of the GNU General Public License
  *    along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-module.exports = {
-	'Lobby': require('./lobby'),
-	'Room': require('./room'),
-	'User': require('./user')
+const Utils = require('../libs/utils');
+const {Request} = require('../libs/json-rpc');
+
+class Notification extends Request {
+	constructor(code, message, data) {
+		super('notify');
+
+		if (Utils.isType(data, 'Array')) {
+			data = {data: data};
+		}
+
+		this.params = [{
+			code: code,
+			message: message,
+			data: data
+		}];
+	}
 }
+
+module.exports = Notification;

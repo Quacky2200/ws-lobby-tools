@@ -16,7 +16,8 @@
  *    along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 module.exports = {
-	'Lobby': require('./lobby'),
-	'Room': require('./room'),
-	'User': require('./user')
-}
+	Ping: require('./ping-pong').Ping,
+	Pong: require('./ping-pong').Pong,
+	Message: require('./message'),
+	Notification: require('./notification'),
+};
