@@ -43,7 +43,7 @@ var servers = {
  * Assumes h, s, and l are contained in the set [0, 1] and
  * returns r, g, and b in the set [0, 255].
  *
- * Source: https://github.com/o-klp/hsl_rgb_converter/blob/master/converter.js0
+ * Source: https://github.com/o-klp/hsl_rgb_converter/blob/master/converter.js
  *
  * @param   {number}  hue           The hue
  * @param   {number}  saturation    The saturation
@@ -145,7 +145,7 @@ servers.http.on('upgrade', function upgrade(req, socket, head) {
 	app(req, res);
 });
 
-var port = process.env.port || 5150;
+var port = process.env.port || 3001;
 var ip = process.env.ip || '127.0.0.1';
 
 // HTTP Server, with WS page socket (same port)

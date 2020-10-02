@@ -401,7 +401,6 @@ var client = (new (function Client() {
 					sendReq('identify', [user], function(event, error, data) {
 						if (error) {
 							displayMessage(
-								// TODO! finish this?
 								"System",
 								"Unable to send message to user: " + error,
 								null,
