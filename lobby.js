@@ -1384,7 +1384,6 @@ class Lobby {
 }
 
 var path = require('path');
-console.log(path);
 Lobby.RoomModule = path.resolve(__dirname, './room');
 Lobby.UserModule = path.resolve(__dirname, './user');
 
