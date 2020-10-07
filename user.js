@@ -69,8 +69,8 @@ class User {
 			if (onDataEventKey == 'data') {
 				if (!buffer) buffer = Buffer.from('');
 				if (newline == -1) {
-					buffer = Buffer.from('');
 					data = buffer + data;
+					buffer = Buffer.from('');
 				} else {
 					var leftover = data.slice(newline+1);
 					data = buffer + data.slice(0, newline);
