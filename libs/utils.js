@@ -63,18 +63,18 @@ class Utils {
 	 * Checks variable for type comparison without the need for long type
 	 * checking if statements (e.g. typeof() && constructor.name)
 	 * @param {any} obj           Object to check type against
-	 * @param {any} comparitor    Comparison type or object
+	 * @param {any} comparator    Comparison type or object
 	 */
-	static isType(obj, comparitor) {
+	static isType(obj, comparator) {
 		var _type = null;
 		var _complex = null;
 
-		if (typeof(comparitor) == 'object') {
+		if (typeof(comparator) == 'object') {
 			// Compare to another object instance
 			_type = 'object';
 			_complex = type.constructor.name;
-		} else if (typeof(comparitor) === 'string') {
-			switch (comparitor.toLowerCase()) {
+		} else if (typeof(comparator) === 'string') {
+			switch (comparator.toLowerCase()) {
 				case 'string':
 					_type = 'string';
 					break;
@@ -98,7 +98,7 @@ class Utils {
 					break;
 				default:
 					_type = 'object';
-					_complex = comparitor;
+					_complex = comparator;
 			}
 		} else {
 			throw new Error('Invalid type parameter');
@@ -112,7 +112,7 @@ class Utils {
 	}
 
 	/**
-	 * Quickly checks the type without comparitor checks.
+	 * Quickly checks the type without comparator checks.
 	 *
 	 * See {@link Utils.isType} function body for more information.
 	 *
@@ -120,10 +120,10 @@ class Utils {
 	 * checking if statements (e.g. typeof() && constructor.name).
 	 *
 	 * @param {any}    obj           Object to check type against
-	 * @param {string} comparitor    Comparison type or object
+	 * @param {string} comparator    Comparison type or object
 	 */
-	static isTypeQuick(obj, comparitor) {
-		return this.getType(obj).toLowerCase() === comparitor.toLowerCase();
+	static isTypeQuick(obj, comparator) {
+		return this.getType(obj).toLowerCase() === comparator.toLowerCase();
 	}
 
 	static getType(obj) {
