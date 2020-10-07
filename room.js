@@ -437,16 +437,14 @@ class Room {
 			throw new Error('Referer is required');
 		}
 
-		if (!(Utils.isType(referer, 'Lobby') || Utils.isType(referer, 'Room'))) {
-			if (!(this.isOwner(user) || this.isAdmin(user)) && code !== 'timeout') {
-				throw new Error('Only admins can close a room');
-			}
-		}
+		var type = Utils.getType(referer);
 
-		if (Utils.isType(referer, 'Room')) {
-			if (referer.id !== this.id) {
-				throw new Error('Only the room can close itself');
-			}
+		if (!(type == 'User' || type == 'Room')) {
+			throw new Error('Invalid Referer');
+		} else if (type == 'User' && !(this.isOwner(referer) || this.isAdmin(referer))) {
+			throw new Error('Only admins can close a room');
+		} else if (type == 'Room' && referer.id !== this.id) {
+			throw new Error('Another room cannot perform this action');
 		}
 
 		lobby.emit(this, 'room-close', {code: code, reason: reason, room: this.exportAsItem()});

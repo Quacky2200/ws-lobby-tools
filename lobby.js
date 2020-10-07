@@ -1101,9 +1101,6 @@ class Lobby {
 		var depth = notifier.depth || 'none';
 		// var timing = notifier.timing || ['local', 'broadcast'];
 
-		local.user = broadcast.user = data.user;
-		local.room = broadcast.room = data.room;
-
 		Utils.debug(`${factory} by ${instigator} (depth: ${depth})`);
 
 		// Only notify the user when a local notifier exists and do it alone

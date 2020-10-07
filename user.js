@@ -59,7 +59,8 @@ class User {
 		var buffer;
 
 		socket.on(onDataEventKey, function(data) {
-			if (onDataEventKey == 'data' && data.indexOf('\n') < 0) {
+			var newline = data.indexOf('\n');
+			if (onDataEventKey == 'data' && newline == -1) {
 				if (!buffer) buffer = Buffer.from('');
 				buffer += data;
 				return;
@@ -67,9 +68,18 @@ class User {
 
 			if (onDataEventKey == 'data') {
 				if (!buffer) buffer = Buffer.from('');
-				data = buffer + data;
-				buffer = null;
+				if (newline == -1) {
+					buffer = Buffer.from('');
+					data = buffer + data;
+				} else {
+					var leftover = data.slice(newline+1);
+					data = buffer + data.slice(0, newline);
+					buffer = Buffer.from(leftover);
+				}
 			}
+
+			data = data.toString().replace(/\r/g, '');
+			if (!data) return;
 
 			var relay = data.slice(0, 5) == 'relay';
 			var room = (this.room ? lobby.getRoom(this.room) : null);
@@ -86,21 +96,48 @@ class User {
 					return;
 				}
 
-				rpc = RPC.Request.import(data) || RPC.Response.import(data);
-				if (!rpc) {
-					// No point replying here...?
-					this.close();
+				try {
+					rpc = JSON.parse(data);
+				} catch (err) {
+					// Throw generic error to client
+					var err = new Error('Invalid Syntax');
+					this.send((new RPC.Response(null, err, null)).export());
+					this.close('invalid-syntax');
 					return;
-					//throw new Error('Unable to parse message');
 				}
 
-				if (Utils.isType(rpc, 'Request')) {
+				// RPC batches
+				if (Array.isArray(rpc)) {
+					var batch = rpc;
+					for (var idx in batch) {
+						rpc = batch[idx];
+						rpc = RPC.Request.import(rpc) || RPC.Response.import(rpc);
+						batch[idx] = null;
+
+						if (!Utils.isType(rpc, 'Request')) {
+							// Do nothing (as a server) on a response
+							return;
+						}
+
+						try {
+							// Do some method requests
+							var response = lobby.runMethod(this, rpc.method, rpc.params);
+							if (response) batch[idx] = new RPC.Response(rpc.id, null, response);
+						} catch (err) {
+							batch[idx] = new RPC.Response(rpc.id, err, null);
+						}
+					}
+					batch = batch.filter((e) => e);
+					this.send(JSON.stringify(batch));
+				} else {
+					rpc = RPC.Request.import(data) || RPC.Response.import(data);
+					if (!Utils.isType(rpc, 'Request')) {
+						// Do nothing (as a server) on a response
+						return;
+					}
 					// Do some method requests
 					var response = lobby.runMethod(this, rpc.method, rpc.params);
 					if (response) this.send((new RPC.Response(rpc.id, null, response)).export());
-				} else {
-					// Do nothing (as a server) on a response
-					return;
 				}
 
 			} catch (err) {
@@ -109,7 +146,7 @@ class User {
 					// Figure out what to send back since it can be any message
 					this.notify(new Notification('error', err.message));
 				} else if (Utils.isType(rpc, 'Request')) {
-					this.send((new RPC.Response(rpc.id, err.message, null)).export());
+					this.send((new RPC.Response(rpc.id, err, null)).export());
 				}
 			}
 		}.bind(this));
@@ -286,8 +323,10 @@ class User {
 		this.leave(code, reason);
 
 		this.socketStatus = 'closed';
-		if (this.socket) {
+		if (this.socket && this.socket.close) {
 			this.socket.close();
+		} else if (this.socket && this.socket.destroy) {
+			this.socket.destroy();
 		}
 
 		return this;
@@ -374,9 +413,9 @@ class User {
 	 *
 	 * If the user is disabled, no messages will be sent.
 	 *
-	 * @param  {...any} args
+	 * @param  {string} data    String to send
 	 */
-	send(...args) {
+	send(data) {
 
 		this.lastActive = Date.now();
 
@@ -389,9 +428,9 @@ class User {
 			//     // Same as readyState == WebSocket.OPEN
 			//     throw new Error('Socket not ready...');
 			// }
-			this.socket.send.apply(this.socket, args);
+			this.socket.send(data + '\n');
 		} else if (this.socket && this.socket.write) {
-			this.socket.write.apply(this.socket, args);
+			this.socket.write(data + '\n');
 		} else {
 			throw new Error('Invalid user socket');
 		}
