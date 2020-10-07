@@ -100,9 +100,8 @@ class User {
 					rpc = JSON.parse(data);
 				} catch (err) {
 					// Throw generic error to client
-					var err = new Error('Invalid Syntax');
-					this.send((new RPC.Response(null, err, null)).export());
-					this.close('invalid-syntax');
+					this.send((new RPC.Response(null, new Error('Invalid Syntax'), null)).export());
+					this.close();
 					return;
 				}
 
