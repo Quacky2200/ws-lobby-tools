@@ -25,7 +25,14 @@ class Sendable {
 
 	import(str) {
 		try {
-			var obj = JSON.parse(str);
+			var obj;
+			if (typeof(str) == 'string') {
+				obj = JSON.parse(str);
+			} else if (str && typeof(str) == 'object') {
+				obj = str;
+			} else {
+				throw new Error('Can only import a string or object');
+			}
 			var banned = ['import', 'export', 'sendTo', 'isValid'];
 			for(var i in obj) {
 				// Skip banned keys
@@ -76,7 +83,7 @@ class Request extends Sendable {
 		this.id = -1;
 		this.method = method;
 		this.params = params || [];
-		this.jsonrpc = 2.0;
+		this.jsonrpc = "2.0";
 	}
 
 	isValid() {
@@ -89,7 +96,7 @@ class Request extends Sendable {
 
 		return (
 			this.id >= 0 &&
-			this.jsonrpc == 2.0 && (
+			this.jsonrpc == "2.0" && (
 				typeof(this.params) == 'object' &&
 				this.params.constructor.name == 'Array'
 			)
@@ -98,9 +105,8 @@ class Request extends Sendable {
 
 	static import(str) {
 		var obj = new this();
-		obj.import(str);
-		if (!obj.isValid()) return null;
-		return obj;
+		if (obj.import(str) && obj.isValid()) return obj;
+		return null;
 	}
 }
 
@@ -109,9 +115,45 @@ class Response extends Sendable {
 	constructor(id, error, result) {
 		super();
 		this.id = id;
-		this.error = error || null;
+		if (error && error instanceof Error) {
+			var code;
+			switch (error.message.toLowerCase()) {
+				case 'parser error':
+				case 'parse error':
+				case 'invalid syntax':
+					code = -32700;
+					break;
+				case 'parse error - unsupported encoding':
+				case 'parser error - unsupported encoding':
+					code = -32701;
+					break;
+				case 'unknown method':
+				case 'method not found':
+					code = -32601;
+					break;
+				case 'invalid method parameters':
+				case 'invalid arguments':
+				case 'invalid parameters':
+					code = -32602;
+					break;
+				default:
+					// Application Error
+					code = -32500;
+			}
+			this.error = {
+				code: code,
+				message: error.message
+			};
+			if (error.data && typeof(error.data) == 'object') {
+				this.error.data = error.data;
+			}
+		} else if (error) {
+			this.error = {code: -32500, message: error.toString()};
+		} else {
+			this.error = null;
+		}
 		this.result = result || null;
-		this.jsonrpc = 2.0;
+		this.jsonrpc = "2.0";
 	}
 
 	isValid() {
@@ -122,14 +164,13 @@ class Response extends Sendable {
 			}
 		}
 
-		return obj.jsonrpc == 2.0;
+		return this.jsonrpc == "2.0";
 	}
 
 	static import(str) {
 		var obj = new this();
-		obj.import(str);
-		if (!obj.isValid()) return null;
-		return obj;
+		if (obj.import(str) && obj.isValid()) return obj;
+		return null;
 	}
 }
 
